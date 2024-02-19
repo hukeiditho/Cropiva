@@ -1,0 +1,43 @@
+import tweepy
+from textblob import TextBlob
+
+# Twitter API credentials
+consumer_key = 'your_consumer_key'
+consumer_secret = 'your_consumer_secret'
+access_token = 'your_access_token'
+access_token_secret = 'your_access_token_secret'
+
+def fetch_tweets(keyword, count=100):
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tweepy.API(auth)
+
+    tweets = api.search(q=keyword, count=count)
+
+    return [tweet.text for tweet in tweets]
+
+def analyze_sentiment(text):
+    analysis = TextBlob(text)
+    return analysis.sentiment.polarity
+
+def main():
+    keyword = input("Enter a keyword to search for on Twitter: ")
+    tweets = fetch_tweets(keyword)
+    
+    if tweets:
+        print(f"Analyzing sentiment for recent tweets containing '{keyword}':\n")
+        for tweet in tweets:
+            sentiment_score = analyze_sentiment(tweet)
+            if sentiment_score > 0:
+                sentiment_label = "Positive"
+            elif sentiment_score < 0:
+                sentiment_label = "Negative"
+            else:
+                sentiment_label = "Neutral"
+            print(f"Tweet: {tweet}")
+            print(f"Sentiment: {sentiment_label} (Score: {sentiment_score})\n")
+    else:
+        print("No tweets found for the specified keyword.")
+
+if __name__ == "__main__":
+    main()
